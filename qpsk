@@ -1,0 +1,92 @@
+clc;
+clear;
+close all;
+
+bits = [0 1 1 0 1 0 0 1];
+
+N = length(bits);
+fc = 1;
+
+t = 0:0.001:2;
+
+b = [];
+qpsk = [];
+be_c = [];
+bes = [];
+bec = [];
+b_o = [];
+b_e = [];
+bite = [];
+bito = [];
+
+for i = 1:N
+    bx = bits(i) * ones(1,1000);
+    b = [b bx];
+end
+
+for i = 1:N
+    if bits(i) == 0
+        bits(i) = -1;
+    end
+
+    if mod(i,2) == 0
+        ebit = bits(i);
+        b_e = [b_e ebit];
+    else
+        obit = bits(i);
+        b_o = [b_o obit];
+    end
+end
+
+for i = 1:N/2
+    be_c = b_e(i) * cos(2*pi*fc*t);
+    bo_s = b_o(i) * sin(2*pi*fc*t);
+
+    q = be_c + bo_s;
+
+    even = b_e(i) * ones(1,2000);
+    odd = b_o(i) * ones(1,2000);
+
+    bite = [bite even];
+    bito = [bito odd];
+
+    qpsk = [qpsk q];
+    bec = [bec be_c];
+    bes = [bes bo_s];
+end
+
+figure('Name','QPSK');
+
+subplot(4,1,1);
+plot(b,'o');
+grid on;
+axis([0 N*1000 -0.5 1.5]);
+xlabel('Time');
+ylabel('Input');
+title('Input Bit Stream');
+
+subplot(4,1,2);
+plot(bes);
+hold on;
+plot(bito,'rs:');
+grid on;
+axis([0 N*1000 -1.5 1.5]);
+ylabel('Odd Bits');
+title('Odd Bits and Sine Component');
+
+subplot(4,1,3);
+plot(bec);
+hold on;
+plot(bite,'rs:');
+grid on;
+axis([0 N*1000 -1.5 1.5]);
+ylabel('Even Bits');
+title('Even Bits and Cosine Component');
+
+subplot(4,1,4);
+plot(qpsk);
+grid on;
+axis([0 N*1000 -1.5 1.5]);
+ylabel('QPSK Signal');
+xlabel('Time');
+title('QPSK Modulated Signal');

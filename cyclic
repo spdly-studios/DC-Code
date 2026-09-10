@@ -1,0 +1,75 @@
+clc;
+clear;
+
+n = 7;
+k = 4;
+
+gen_poly = cyclpoly(n,k);
+
+[H,G] = cyclgen(n,gen_poly);
+
+disp('Generator Polynomial:');
+disp(gen_poly);
+
+disp('Generator Matrix (G):');
+disp(G);
+
+disp('Parity Check Matrix (H):');
+disp(H);
+
+msg = input('Enter the binary message: ');
+
+if length(msg)~=k
+error('Message must contain exactly %d bits.',k);
+end
+
+codeword = mod(msg*G,2);
+
+disp('Encoded Codeword:');
+disp(codeword);
+
+
+recd = input('Enter received codeword (press Enter for no error): ');
+
+if isempty(recd)
+recd = codeword;
+end
+
+if length(recd)~=n
+error('Received codeword must contain %d bits.',n);
+end
+
+synd_table = syndtable(H);
+
+syndrome = mod(recd*H',2);
+
+disp('Syndrome:');
+disp(syndrome);
+
+syn_dec = bi2de(syndrome,'left-msb');
+
+error_pattern = synd_table(syn_dec+1,:);
+
+corrected_code = mod(recd + error_pattern,2);
+
+if all(syndrome==0)
+disp('No Error Detected');
+else
+disp('Error Detected');
+disp('Error Pattern:');
+disp(error_pattern);
+
+disp('Corrected Codeword:');
+disp(corrected_code);
+end
+
+decoded_msg = decode(corrected_code,n,k,'cyclic',gen_poly);
+
+disp('Decoded Message:');
+disp(decoded_msg);
+
+if isequal(decoded_msg,msg)
+disp('Decoding Successful');
+else
+disp('Decoding Failed');
+end

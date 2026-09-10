@@ -1,0 +1,46 @@
+clc; clear;
+
+G = [1 0 0 0 1 1 0;
+    0 1 0 0 1 0 1;
+    0 0 1 0 0 1 1;
+    0 0 0 1 1 1 1]; 
+
+H = [1 1 0 1 1 0 0;
+    1 0 1 1 0 1 0;
+    0 1 1 1 0 0 1];
+
+msg = [1 0 1 1];
+
+codeword = mod(msg * G, 2);
+
+disp('Encoded codeword:');
+disp(codeword);
+
+error_vector = zeros(1, 7);
+error_position = 3;
+error_vector(error_position) = mod(error_vector(error_position) + 1, 2);
+received = mod(codeword + error_vector, 2);
+
+disp('Received codeword (with error):');
+disp(received);
+syndrome = mod(H * received', 2);
+
+disp('Syndrome:');
+disp(syndrome');
+
+if all(syndrome == 0)
+    disp('No error detected.');
+    corrected = received;
+else
+    syndrome_decimal =sum(syndrome'.*[4 2 1]);
+    disp(['Error detected at position: ', num2str(syndrome_decimal)]);
+    corrected = received;
+    corrected(syndrome_decimal) = mod(corrected(syndrome_decimal) + 1, 2);
+end
+
+disp('Corrected codeword:');
+disp(corrected);
+
+decoded_msg = corrected(1:4);
+disp('Decoded message:');
+disp(decoded_msg);

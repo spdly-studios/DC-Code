@@ -1,0 +1,64 @@
+clc; clear; close all;
+
+function Q = gram_schmidt(A)
+    [m, n] = size(A);
+    Q = zeros(m, n);
+    for j = 1:n
+        v = A(:, j);
+        for i = 1:j-1
+            proj_v_qi = (Q(:, i)' * v) * Q(:, i);
+            v = v - proj_v_qi;
+        end
+        norm_v = norm(v);
+        if norm_v < eps
+            Q(:, j) = zeros(m, 1);
+        else
+            Q(:, j) = v / norm_v;
+        end
+    end
+end
+
+%% Constants
+Fs_gs = 100;
+t_gs = (0:Fs_gs-1)/Fs_gs;
+
+%% Generate Input Signals
+
+signal_a = sin(2*pi*5*t_gs);
+signal_b = sin(2*pi*5*t_gs + pi/4) + 0.5*cos(2*pi*10*t_gs);
+
+A_signals = [signal_a(:), signal_b(:)];
+
+%% Perform Gram-Schmidt Orthogonalization
+
+Q_signals = gram_schmidt(A_signals);
+
+orthogonal_signal1 = Q_signals(:,1)';
+orthogonal_signal2 = Q_signals(:,2)';
+
+%% Verify Orthogonality
+
+dot_product = dot(orthogonal_signal1, orthogonal_signal2);
+
+fprintf('Dot product of orthogonalized signals: %f\n', dot_product);
+
+%% Plot Original and Orthogonalized Signals
+
+figure;
+
+subplot(2,1,1);
+plot(t_gs, signal_a, 'b', t_gs, signal_b, 'r--');
+title('Original Non-Orthogonal Signals');
+xlabel('Time (s)');
+ylabel('Amplitude');
+legend('Signal A', 'Signal B');
+grid on;
+
+subplot(2,1,2);
+plot(t_gs, orthogonal_signal1, 'b', ...
+     t_gs, orthogonal_signal2, 'r--');
+title('Gram-Schmidt Orthogonalized Sign als');
+xlabel('Time (s)');
+ylabel('Amplitude');
+legend('Orthogonal Signal 1', 'Orthogonal Signal 2');
+grid on;
