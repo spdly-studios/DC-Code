@@ -1,0 +1,30 @@
+clc; clear; close all;
+
+p = [1 0 1 0 1 1 0 0];
+d = randi([0 1],1,16);
+x = [zeros(1,5) p d];
+
+SNR = 10;
+r = x + sqrt(mean(x.^2)/10^(SNR/10))*randn(size(x));
+
+pb = 2*p-1;
+c = zeros(1,length(r)-length(p)+1);
+
+for k = 1:length(c)
+    c(k) = sum(r(k:k+length(p)-1).*pb);
+end
+
+[~,st] = max(c);
+q = r(st+length(p):st+length(p)+length(d)-1) > 0.5;
+
+disp('Transmitted Data:'); disp(d);
+disp('Recovered Data:'); disp(q);
+fprintf('BER = %.4f\n',mean(d~=q));
+
+figure;
+subplot(3,1,1); stem(x,'filled'); title('Transmitted Frame'); grid on;
+subplot(3,1,2); stem(c,'filled'); title('Preamble Correlation'); grid on;
+subplot(3,1,3);
+stem(d,'filled'); hold on; stem(q,'r--');
+title('Transmitted vs Recovered Data');
+legend('Transmitted','Recovered'); grid on;

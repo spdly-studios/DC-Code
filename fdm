@@ -1,0 +1,29 @@
+clc;clear;close all
+
+Fs=25e3; T=.02;t=0:1/Fs:T;
+fc=[2500 1200 3000 1500 4000];
+
+m=[sin(2*pi*100*t);sin(2*pi*50*t);sin(2*pi*120*t);
+   square(2*pi*100*t);cos(2*pi*100*t)];
+
+s=m.*cos(2*pi*fc'.*t);
+
+figure
+for i=1:5
+    subplot(5,2,2*i-1),plot(t,s(i,:)),title(['DSB-SC ',num2str(i)])
+    subplot(5,2,2*i),plot(abs(fft(s(i,:)))),title('Spectrum')
+end
+
+x=sum(s);
+figure
+subplot(2,1,1),plot(t,x),title('Multiplexed Signal')
+subplot(2,1,2),plot(linspace(-Fs/2,Fs/2,length(x)),fftshift(abs(fft(x))))
+title('Multiplexed Spectrum')
+
+F=[2400 2600;1150 1250;2880 3120;1400 1600;3900 4100];
+figure
+for i=1:5
+    b=fir1(100,F(i,:)/(Fs/2),'bandpass');
+    z=demod(filter(b,1,x),fc(i),Fs);
+    subplot(5,1,i),plot(t,z),title(['Demodulated Message ',num2str(i)])
+end

@@ -1,0 +1,41 @@
+clc; clear; close all;
+
+d = randi([0 1],1,20);
+b = 2*d-1;
+
+fc = 1000;
+fs = 10000;
+Ns = 10;
+t = (0:length(b)*Ns-1)/fs;
+p = -3*pi/4;
+
+bb = repelem(b,Ns);
+x = bb.*cos(2*pi*fc*t+p);
+
+r1 = x.*cos(2*pi*fc*t);
+r2 = x.*cos(2*pi*fc*t+p);
+
+a = sum(reshape(r1,Ns,[]),1) > 0;
+s = sum(reshape(r2,Ns,[]),1) > 0;
+
+disp('Original Data:');
+disp(d);
+
+disp('Recovered without Carrier Sync:');
+disp(a);
+
+disp('Recovered with Carrier Sync:');
+disp(s);
+
+figure;
+subplot(3,1,1);
+plot(x);
+title('Transmitted BPSK Signal');
+
+subplot(3,1,2);
+stem(a);
+title('Without Carrier Synchronization');
+
+subplot(3,1,3);
+stem(s);
+title('With Carrier Synchronization');

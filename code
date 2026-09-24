@@ -1,0 +1,43 @@
+clc; clear; close all;
+
+d = [1 0 1 1 0];
+p = [1 0 1 0 1 1 0];
+
+d = 2*d-1;
+p = 2*p-1;
+n = length(p);
+
+x = kron(d,p);
+
+SNR = 5;
+noise = sqrt(mean(x.^2)/10^(SNR/10))*randn(size(x));
+r = x + noise;
+
+c = zeros(1,n);
+for k = 1:n
+    c(k) = sum(r(1:n).*circshift(p,k-1));
+end
+
+[~,k] = max(c);
+p = circshift(p,k-1);
+
+z = zeros(1,length(d));
+for i = 1:length(d)
+    z(i) = sum(r((i-1)*n+1:i*n).*p) > 0;
+end
+
+disp('Original Data:');
+disp([1 0 1 1 0]);
+disp('Recovered Data:');
+disp(z);
+
+figure;
+subplot(2,1,1);
+plot(x);
+title('Spread Signal');
+
+subplot(2,1,2);
+bar(c);
+title('Cross-Correlation');
+xlabel('Shift Index');
+ylabel('Correlation');
