@@ -1,0 +1,16 @@
+clear; clc;
+s = input('Enter the message : ','s');
+E = [2 1 5 3 4];
+D = [2 1 4 5 3];
+n = length(E);
+L = length(s);
+
+s = [s repmat('Z',1,mod(-L,n))];
+B = reshape(s,n,[])';
+cipher = reshape(B(:,E).',1,[]);
+fprintf('Encrypted text : %s\n',cipher);
+
+B = reshape(cipher,n,[])';
+plain = reshape(B(:,D).',1,[]);
+fprintf('Decrypted text : %s\n',plain);
+fprintf('Original plaintext : %s\n',plain(1:L));
