@@ -1,0 +1,12 @@
+clc; clear;
+plain = upper(input('Enter text:','s'));
+k = [3 3; 2 5];
+p = double(plain)-65;
+p = reshape(p,2,[])';
+c = mod(p*k,26)
+cipher = char(reshape(c',1,[])+65);
+fprintf('Encrypted text: %s\n',cipher);
+ki = [15 17; 20 9];
+D = mod(c*ki,26);
+decrypt = char(reshape(D',1,[])+65);
+fprintf('Decrypted text: %s\n',decrypt);
